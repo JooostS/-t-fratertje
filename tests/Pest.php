@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\MemberType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +16,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +45,29 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Geldige invoer voor het lid-formulier; overschrijf losse velden per test.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function memberPayload(string $typeSlug = MemberType::ADULT, array $overrides = []): array
 {
-    // ..
+    $type = MemberType::where('slug', $typeSlug)->firstOrFail();
+
+    return array_merge([
+        'member_type_id' => $type->id,
+        'first_name' => 'Anna',
+        'last_name' => 'de Vries',
+        'email' => 'anna@example.test',
+        'birth_date' => '1985-04-12',
+        'street' => 'Vinkenlaan',
+        'house_number' => '12',
+        'house_number_addition' => 'A',
+        'postal_code' => '1234 AB',
+        'city' => 'Utrecht',
+        'breeding_number' => $type->is_nbvv_member ? 'NBVV-100200' : null,
+        'issue_year' => $type->is_nbvv_member ? 2020 : null,
+        'is_active' => 1,
+    ], $overrides);
 }

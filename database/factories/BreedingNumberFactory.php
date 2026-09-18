@@ -1,0 +1,18 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Member;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class BreedingNumberFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'member_id' => Member::factory(),
+            'breeding_number' => 'NBVV-'.$this->faker->unique()->numerify('######'),
+            'issue_year' => $this->faker->numberBetween(2015, now()->year),
+        ];
+    }
+}
