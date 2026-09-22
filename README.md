@@ -22,7 +22,7 @@ Webapplicatie voor het beheren van leden, adressen, lidsoorten, NBvV-gegevens (k
 ## Bedrijfsregels
 
 - **Lidsoorten:** volwassen lid (vanaf 18 jaar), jeugdlid (tot 18 jaar), gastlid (alle leeftijden). De leeftijdsgrenzen worden in de validatie afgedwongen.
-- **Kweeknummer (= NBvV-lidnummer):** jeugd- en volwassen leden hebben verplicht een uniek kweeknummer; een gastlid heeft er **geen**. Een kweeknummer hoort bij maximaal één lid. Afgedwongen in de database (unieke indexen), in de Form Requests en in `MemberService`.
+- **Kweeknummer (= NBvV-lidnummer):** jeugd- en volwassen leden hebben verplicht een uniek kweeknummer; een gastlid heeft er **geen**. Een kweeknummer hoort bij maximaal één lid en bestaat uit precies 4 letters en/of cijfers, meestal 1 cijfer gevolgd door 3 letters (bv. `1TKY`). Afgedwongen in de database (`varchar(4)` + unieke index), in de Form Requests (`regex:/^[A-Z0-9]{4}$/`) en in `MemberService`.
 - **Contributie:** volwassen € 36,00, jeugd € 18,00, gast € 18,00 per jaar. Een jeugdlid betaalt ook in het jaar waarin het 18 wordt nog het jeugdtarief (`ContributionCalculator::isYouthTariff`).
 - **Ingangsdatum:** aanmelding + 3 weken, dan de eerstvolgende 1e van de maand (valt de datum precies op de 1e, dan geldt die). Contributie naar rato van de resterende maanden van dat jaar.
   - 5 maart → 26 maart → lid per 1 april → 9 maanden.
@@ -79,8 +79,6 @@ Bouw de database op met migrations en seeders (lidsoorten, tarieven, testgebruik
 php artisan migrate:fresh --seed
 ```
 
-Liever de kant-en-klare database? `database/fratertje.sql` is een SQL-export van de gevulde database en kan direct in MySQL worden geïmporteerd.
-
 ---
 
 ## Test-inloggegevens
@@ -116,7 +114,7 @@ Jaarlijkse contributiefacturering voor bestaande leden: `php artisan invoices:ge
 php artisan test
 ```
 
-62 Pest-tests (in-memory SQLite, dus de MySQL-database blijft ongemoeid):
+63 Pest-tests (in-memory SQLite, dus de MySQL-database blijft ongemoeid):
 
 - **Unit** — `ContributionCalculatorTest`: ingangsdatum, aantal maanden, jeugdtarief en bedragen naar rato, inclusief de voorbeelden uit de opdracht.
 - **Feature** — login/uitloggen en afscherming van alle beheerpagina's; validatie van het ledenformulier (kweeknummer verplicht/verboden/uniek, leeftijdsgrenzen, formaten); aanmelden → quarantaine → goedkeuren → factuur; afmelden → restitutie; prijswijzigingen alleen voor een komend jaar; soft-deletes met archief en herstel; zoeken en filteren; alle pagina's renderen; de publieke pagina's (home, informatie, contactformulier, fotoverantwoording).
@@ -176,7 +174,7 @@ erDiagram
     breeding_numbers {
         bigint id PK
         bigint member_id FK,UK
-        string breeding_number UK
+        string breeding_number UK "4 tekens"
         smallint issue_year
         timestamp deleted_at
     }
@@ -219,7 +217,6 @@ public/images/birds/ Vogelfoto's van Wikimedia Commons (CC-licenties, zie de voe
 database/
   migrations/        Databasestructuur
   seeders/           Lidsoorten + tarieven, testgebruiker en voorbeeldleden
-  fratertje.sql      SQL-export
 resources/views/     Blade-views en -componenten
 lang/nl/             Nederlandse validatiemeldingen
 tests/               Unit- en feature-tests (Pest)
