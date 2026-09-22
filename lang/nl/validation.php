@@ -36,7 +36,8 @@ return [
             'regex' => 'Vul alleen cijfers in; een toevoeging als “A” of “bis” vul je hieronder in.',
         ],
         'breeding_number' => [
-            'regex' => 'Een kweeknummer bestaat alleen uit letters, cijfers en streepjes.',
+            'size' => 'Een kweeknummer bestaat uit precies 4 letters en/of cijfers.',
+            'regex' => 'Een kweeknummer bestaat uit precies 4 letters en/of cijfers.',
             'unique' => 'Dit kweeknummer is al aan een ander lid toegekend.',
         ],
         'member_id' => [

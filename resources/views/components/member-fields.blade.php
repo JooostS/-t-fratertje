@@ -43,7 +43,7 @@
         <legend class="mb-1 text-base font-semibold text-brand-900">NBvV-gegevens</legend>
         <p class="mb-3 text-sm text-stone-600">Jeugd- en volwassen leden zijn automatisch lid van de NBvV en hebben een uniek kweeknummer. Gastleden hebben geen kweeknummer.</p>
         <div class="grid gap-4 sm:grid-cols-2">
-            <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" :value="$member?->breedingNumber?->breeding_number" maxlength="20" hint="Letters, cijfers en streepjes, bijvoorbeeld NBVV-123456." />
+            <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" :value="$member?->breedingNumber?->breeding_number" maxlength="4" hint="Precies 4 letters en/of cijfers, bijvoorbeeld 1TKY of FR75." />
             <x-field name="issue_year" label="Uitgiftejaar" type="number" :value="$member?->breedingNumber?->issue_year ?? now()->year" min="1900" :max="now()->year" />
         </div>
     </fieldset>

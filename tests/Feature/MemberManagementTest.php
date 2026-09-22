@@ -17,7 +17,7 @@ it('creates a member together with address and breeding number', function () {
     $member = Member::with(['address', 'breedingNumber'])->firstOrFail();
 
     expect($member->address->city)->toBe('Utrecht')
-        ->and($member->nbvv_number)->toBe('NBVV-100200')
+        ->and($member->nbvv_number)->toBe('1TKY')
         ->and($member->is_active)->toBeTrue();
 });
 
@@ -40,7 +40,7 @@ it('lets a guest member exist without breeding number', function () {
 });
 
 it('refuses a breeding number for a guest member', function () {
-    $this->post(route('members.store'), memberPayload(MemberType::GUEST, ['breeding_number' => 'NBVV-1']))
+    $this->post(route('members.store'), memberPayload(MemberType::GUEST, ['breeding_number' => 'FR01']))
         ->assertSessionHasErrors('breeding_number');
 });
 
@@ -92,7 +92,7 @@ it('updates a member and removes the breeding number when switching to guest', f
 
     $this->put(route('members.update', $member), memberPayload(MemberType::ADULT))->assertSessionHasNoErrors();
 
-    expect($member->fresh()->nbvv_number)->toBe('NBVV-100200');
+    expect($member->fresh()->nbvv_number)->toBe('1TKY');
 });
 
 it('soft deletes a member and shows it in the archive until restored', function () {
@@ -117,12 +117,12 @@ it('searches and filters members', function () {
     $guest = MemberType::where('slug', MemberType::GUEST)->first();
 
     $jansen = Member::factory()->create(['member_type_id' => $adult->id, 'first_name' => 'Piet', 'last_name' => 'Jansen']);
-    BreedingNumber::factory()->create(['member_id' => $jansen->id, 'breeding_number' => 'ZZ-777']);
+    BreedingNumber::factory()->create(['member_id' => $jansen->id, 'breeding_number' => 'ZZ77']);
     Member::factory()->create(['member_type_id' => $guest->id, 'first_name' => 'Klaas', 'last_name' => 'Bakker']);
     Member::factory()->inactive()->create(['member_type_id' => $adult->id, 'first_name' => 'Marie', 'last_name' => 'Smit']);
 
     $this->get(route('members.index', ['q' => 'Jansen']))->assertSee('Jansen')->assertDontSee('Bakker');
-    $this->get(route('members.index', ['q' => 'ZZ-777']))->assertSee('Jansen')->assertDontSee('Bakker');
+    $this->get(route('members.index', ['q' => 'ZZ77']))->assertSee('Jansen')->assertDontSee('Bakker');
     $this->get(route('members.index', ['member_type_id' => $guest->id]))->assertSee('Bakker')->assertDontSee('Jansen');
     $this->get(route('members.index', ['status' => 'inactive']))->assertSee('Smit')->assertDontSee('Jansen');
     $this->get(route('members.index', ['status' => 'active']))->assertSee('Jansen')->assertDontSee('Smit');
@@ -134,5 +134,5 @@ it('shows the detail page with all data', function () {
     $this->get(route('members.show', Member::firstOrFail()))
         ->assertOk()
         ->assertSee('Vinkenlaan 12 A')
-        ->assertSee('NBVV-100200');
+        ->assertSee('1TKY');
 });

@@ -66,7 +66,7 @@ function memberPayload(string $typeSlug = MemberType::ADULT, array $overrides = 
         'house_number_addition' => 'A',
         'postal_code' => '1234 AB',
         'city' => 'Utrecht',
-        'breeding_number' => $type->is_nbvv_member ? 'NBVV-100200' : null,
+        'breeding_number' => $type->is_nbvv_member ? '1TKY' : null,
         'issue_year' => $type->is_nbvv_member ? 2020 : null,
         'is_active' => 1,
     ], $overrides);

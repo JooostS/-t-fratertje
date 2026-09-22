@@ -16,7 +16,7 @@
             @enderror
         </div>
 
-        <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" required maxlength="20" hint="Letters, cijfers en streepjes. Elk kweeknummer is uniek." />
+        <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" required maxlength="4" hint="Precies 4 letters en/of cijfers, bijvoorbeeld 1TKY of FR75. Elk kweeknummer is uniek." />
         <x-field name="issue_year" label="Uitgiftejaar" type="number" :value="now()->year" min="1900" :max="now()->year" required />
 
         <div class="flex gap-2">

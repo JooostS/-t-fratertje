@@ -33,7 +33,7 @@ class BreedingNumberRequest extends FormRequest
         $current = $this->route('breeding_number');
 
         $rules = [
-            'breeding_number' => ['required', 'string', 'max:20', 'regex:/^[A-Z0-9-]+$/', Rule::unique('breeding_numbers', 'breeding_number')->ignore($current)],
+            'breeding_number' => ['required', 'string', 'size:4', 'regex:/^[A-Z0-9]{4}$/', Rule::unique('breeding_numbers', 'breeding_number')->ignore($current)],
             'issue_year' => ['required', 'integer', 'between:1900,'.now()->year],
         ];
 

@@ -11,7 +11,8 @@ class BreedingNumberFactory extends Factory
     {
         return [
             'member_id' => Member::factory(),
-            'breeding_number' => 'NBVV-'.$this->faker->unique()->numerify('######'),
+            // Een echt kweeknummer is meestal 1 cijfer gevolgd door 3 letters, bv. "1TKY".
+            'breeding_number' => $this->faker->unique()->regexify('[0-9][A-Z]{3}'),
             'issue_year' => $this->faker->numberBetween(2015, now()->year),
         ];
     }
