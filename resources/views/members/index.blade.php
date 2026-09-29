@@ -1,7 +1,10 @@
 <x-layouts.app :title="$archived ? 'Archief leden' : 'Leden'">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h1 class="page-title">{{ $archived ? 'Archief: verwijderde leden' : 'Leden' }}</h1>
-        <a href="{{ route('members.create') }}" class="btn-primary">Lid toevoegen</a>
+        <div class="flex gap-2">
+            <a href="{{ route('members.export', request()->query()) }}" class="btn-secondary">Exporteren naar CSV</a>
+            <a href="{{ route('members.create') }}" class="btn-primary">Lid toevoegen</a>
+        </div>
     </div>
 
     <form method="GET" action="{{ route('members.index') }}" class="card mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">

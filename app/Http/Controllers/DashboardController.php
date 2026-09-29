@@ -14,7 +14,7 @@ class DashboardController extends Controller
             'activeCount' => Member::withStatus(Member::STATUS_ACTIVE)->count(),
             'archivedCount' => Member::onlyTrashed()->count(),
             'memberTypes' => MemberType::withCount(['members' => fn ($query) => $query->withStatus(Member::STATUS_ACTIVE)])->get(),
-            'quarantineMembers' => Member::with('memberType')->withStatus(Member::STATUS_QUARANTINE)->latest()->get(),
+            'quarantineMembers' => Member::with(['memberType', 'breedingNumber'])->withStatus(Member::STATUS_QUARANTINE)->latest()->get(),
         ]);
     }
 }

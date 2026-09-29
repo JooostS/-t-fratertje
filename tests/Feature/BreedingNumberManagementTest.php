@@ -91,6 +91,19 @@ it('soft deletes the breeding number of an inactive member and restores it from 
     expect(BreedingNumber::count())->toBe(1);
 });
 
+it('shows active and archived breeding numbers together in the history', function () {
+    $active = BreedingNumber::factory()->create(['breeding_number' => 'FR01', 'issue_year' => 2022]);
+    $archived = BreedingNumber::factory()->create(['breeding_number' => 'FR02', 'issue_year' => 2018]);
+    $archived->member->update(['is_active' => false]);
+    $archived->delete();
+
+    $this->get(route('breeding-numbers.history'))
+        ->assertOk()
+        ->assertSee('FR01')
+        ->assertSee('FR02')
+        ->assertSee('Gearchiveerd');
+});
+
 it('manages member types and blocks removing one that is in use', function () {
     $this->post(route('member-types.store'), ['name' => 'Ere-lid', 'description' => 'Voor verdienste', 'is_nbvv_member' => 0, 'amount' => 0])
         ->assertSessionHasNoErrors();

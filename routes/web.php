@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
+    Route::get('leden/exporteren', [MemberController::class, 'export'])->name('members.export');
     Route::patch('leden/{member}/herstellen', [MemberController::class, 'restore'])->withTrashed()->name('members.restore');
     Route::patch('leden/{member}/goedkeuren', [MemberController::class, 'approve'])->name('members.approve');
     Route::resource('leden', MemberController::class)
@@ -44,12 +45,16 @@ Route::middleware('auth')->group(function () {
         ->names('members')
         ->withTrashed(['show']);
 
-    Route::resource('lidsoorten', MemberTypeController::class)
-        ->parameters(['lidsoorten' => 'member_type'])
-        ->names('member-types')
-        ->except('show');
-    Route::post('lidsoorten/{member_type}/tarieven', [ContributionRateController::class, 'store'])->name('contribution-rates.store');
+    // Lidsoorten en tarieven zijn voorbehouden aan de rol 'beheerder'.
+    Route::middleware('can:beheer-lidsoorten')->group(function () {
+        Route::resource('lidsoorten', MemberTypeController::class)
+            ->parameters(['lidsoorten' => 'member_type'])
+            ->names('member-types')
+            ->except('show');
+        Route::post('lidsoorten/{member_type}/tarieven', [ContributionRateController::class, 'store'])->name('contribution-rates.store');
+    });
 
+    Route::get('kweeknummers/geschiedenis', [BreedingNumberController::class, 'history'])->name('breeding-numbers.history');
     Route::patch('kweeknummers/{breeding_number}/herstellen', [BreedingNumberController::class, 'restore'])->withTrashed()->name('breeding-numbers.restore');
     Route::resource('kweeknummers', BreedingNumberController::class)
         ->parameters(['kweeknummers' => 'breeding_number'])

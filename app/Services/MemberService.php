@@ -84,12 +84,23 @@ class MemberService
     }
 
     /**
-     * Ook het adres wordt niet definitief verwijderd; het kweeknummer blijft gereserveerd.
+     * Ook het adres wordt niet definitief verwijderd; het kweeknummer blijft gereserveerd,
+     * maar wordt (net als het lid) gearchiveerd zodat het niet als "actief" blijft staan.
      */
     public function archive(Member $member): void
     {
         $member->update(['is_active' => false]);
+        $member->breedingNumber?->delete();
         $member->delete();
+    }
+
+    /**
+     * Haalt een gearchiveerd lid terug, met het kweeknummer dat samen met hem werd gearchiveerd.
+     */
+    public function restore(Member $member): void
+    {
+        $member->restore();
+        BreedingNumber::withTrashed()->where('member_id', $member->id)->first()?->restore();
     }
 
     /**
@@ -126,6 +137,11 @@ class MemberService
         if (! $member->memberType->is_nbvv_member) {
             $existing?->delete();
 
+            return;
+        }
+
+        // Publieke aanmelding: kweeknummer ontbreekt nog en wordt pas bij verwerking ingevuld.
+        if (! array_key_exists('breeding_number', $data)) {
             return;
         }
 

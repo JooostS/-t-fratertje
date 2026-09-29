@@ -13,12 +13,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Test-inlogaccount voor de administratie
+        // Test-inlogaccounts voor de administratie: beheerder mag lidsoorten/tarieven wijzigen, secretaris niet.
         User::factory()->create([
             'name' => 'Beheerder',
             'email' => 'admin@fratertje.test',
             'password' => 'password',
-            'role' => 'beheerder',
+            'role' => User::ROLE_BEHEERDER,
+        ]);
+
+        User::factory()->create([
+            'name' => 'Secretaris',
+            'email' => 'secretaris@fratertje.test',
+            'password' => 'password',
+            'role' => User::ROLE_SECRETARIS,
         ]);
 
         $this->call(MemberTypeSeeder::class);
@@ -49,9 +56,9 @@ class DatabaseSeeder extends Seeder
         BreedingNumber::factory()->create(['member_id' => $archived->id]);
         $archived->delete();
 
-        // Eén aanmelding die nog in quarantaine staat, voor demodoeleinden
-        $quarantined = Member::factory()->quarantine()->create(['member_type_id' => $volwassenLid->id]);
-        BreedingNumber::factory()->create(['member_id' => $quarantined->id]);
+        // Eén aanmelding die nog in quarantaine staat, voor demodoeleinden — bewust zonder
+        // kweeknummer, zoals een echte aanmelding via het publieke formulier binnenkomt.
+        Member::factory()->quarantine()->create(['member_type_id' => $volwassenLid->id]);
 
         // Contributiefactuur van het lopende jaar voor alle actieve leden
         Member::with('memberType')

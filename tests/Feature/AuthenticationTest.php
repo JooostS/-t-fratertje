@@ -52,3 +52,24 @@ it('stores passwords hashed', function () {
     expect($user->password)->not->toBe('geheim-wachtwoord')
         ->and(Hash::check('geheim-wachtwoord', $user->password))->toBeTrue();
 });
+
+it('only lets a beheerder manage lidsoorten and tarieven, not a secretaris', function () {
+    $secretaris = User::factory()->create(['role' => User::ROLE_SECRETARIS]);
+
+    $this->actingAs($secretaris)->get(route('member-types.index'))->assertForbidden();
+    $this->actingAs($secretaris)->get(route('member-types.create'))->assertForbidden();
+
+    $beheerder = User::factory()->create(['role' => User::ROLE_BEHEERDER]);
+
+    $this->actingAs($beheerder)->get(route('member-types.index'))->assertOk();
+});
+
+it('hides the lidsoorten link in the navigation for a secretaris', function () {
+    $secretaris = User::factory()->create(['role' => User::ROLE_SECRETARIS]);
+
+    $this->actingAs($secretaris)->get(route('dashboard'))->assertDontSee('Lidsoorten');
+
+    $beheerder = User::factory()->create(['role' => User::ROLE_BEHEERDER]);
+
+    $this->actingAs($beheerder)->get(route('dashboard'))->assertSee('Lidsoorten');
+});

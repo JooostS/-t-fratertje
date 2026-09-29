@@ -36,6 +36,20 @@ class BreedingNumberController extends Controller
         return view('breeding-numbers.create', ['members' => $this->membersWithoutBreedingNumber()]);
     }
 
+    /**
+     * Alle ooit uitgegeven kweeknummers samen, actief én gearchiveerd, op uitgiftejaar.
+     */
+    public function history(): View
+    {
+        $breedingNumbers = BreedingNumber::withTrashed()
+            ->with('member')
+            ->orderByDesc('issue_year')
+            ->orderBy('breeding_number')
+            ->paginate(20);
+
+        return view('breeding-numbers.history', ['breedingNumbers' => $breedingNumbers]);
+    }
+
     public function store(BreedingNumberRequest $request): RedirectResponse
     {
         BreedingNumber::create($request->validated());

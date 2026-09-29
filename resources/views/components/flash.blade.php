@@ -10,7 +10,13 @@
     </div>
 @endif
 
-@if ($errors->any() && ! $errors->has('delete'))
+@if ($errors->has('approve'))
+    <div role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {{ $errors->first('approve') }}
+    </div>
+@endif
+
+@if ($errors->any() && ! $errors->has('delete') && ! $errors->has('approve'))
     <div role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
         Controleer de gemarkeerde velden: niet alles is goed ingevuld.
     </div>

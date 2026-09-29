@@ -1,7 +1,10 @@
 <x-layouts.app :title="$archived ? 'Archief kweeknummers' : 'Kweeknummers'">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h1 class="page-title">{{ $archived ? 'Archief: verwijderde kweeknummers' : 'Kweeknummers' }}</h1>
-        <a href="{{ route('breeding-numbers.create') }}" class="btn-primary">Kweeknummer registreren</a>
+        <div class="flex gap-2">
+            <a href="{{ route('breeding-numbers.history') }}" class="btn-secondary">Geschiedenis</a>
+            <a href="{{ route('breeding-numbers.create') }}" class="btn-primary">Kweeknummer registreren</a>
+        </div>
     </div>
 
     <form method="GET" action="{{ route('breeding-numbers.index') }}" class="card mt-6 flex flex-wrap items-end gap-4">

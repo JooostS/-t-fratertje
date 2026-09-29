@@ -25,19 +25,31 @@
             @else
                 <div class="table-wrap">
                     <table class="data-table">
-                        <thead><tr><th>Naam</th><th>Lidsoort</th><th>Aangemeld</th><th></th></tr></thead>
+                        <thead><tr><th>Naam</th><th>Lidsoort</th><th>Kweeknummer</th><th>Aangemeld</th><th></th></tr></thead>
                         <tbody>
                             @foreach ($quarantineMembers as $member)
+                                @php $missingBreedingNumber = $member->memberType->is_nbvv_member && ! $member->breedingNumber; @endphp
                                 <tr>
                                     <td><a href="{{ route('members.show', $member) }}" class="font-medium text-brand-700 hover:underline">{{ $member->full_name }}</a></td>
                                     <td>{{ $member->memberType->name }}</td>
+                                    <td>
+                                        @if ($missingBreedingNumber)
+                                            <span class="badge bg-amber-100 text-amber-900">Ontbreekt nog</span>
+                                        @else
+                                            {{ $member->nbvv_number ?? '—' }}
+                                        @endif
+                                    </td>
                                     <td>{{ $member->registered_at->format('d-m-Y') }}</td>
                                     <td class="text-right">
-                                        <form method="POST" action="{{ route('members.approve', $member) }}">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="btn-primary btn-sm">Goedkeuren</button>
-                                        </form>
+                                        @if ($missingBreedingNumber)
+                                            <a href="{{ route('members.edit', $member) }}" class="btn-secondary btn-sm">Eerst kweeknummer toevoegen</a>
+                                        @else
+                                            <form method="POST" action="{{ route('members.approve', $member) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn-primary btn-sm">Goedkeuren</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

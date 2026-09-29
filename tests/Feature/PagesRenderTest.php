@@ -22,6 +22,7 @@ it('renders every administration page for a seeded database', function () {
         route('breeding-numbers.index'),
         route('breeding-numbers.create'),
         route('breeding-numbers.edit', BreedingNumber::firstOrFail()),
+        route('breeding-numbers.history'),
         route('invoices.index'),
     ] as $url) {
         $this->get($url)->assertOk();

@@ -39,14 +39,18 @@
         </div>
     </fieldset>
 
-    <fieldset id="breeding-fields">
-        <legend class="mb-1 text-base font-semibold text-brand-900">NBvV-gegevens</legend>
-        <p class="mb-3 text-sm text-stone-600">Jeugd- en volwassen leden zijn automatisch lid van de NBvV en hebben een uniek kweeknummer. Gastleden hebben geen kweeknummer.</p>
-        <div class="grid gap-4 sm:grid-cols-2">
-            <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" :value="$member?->breedingNumber?->breeding_number" maxlength="4" hint="Precies 4 letters en/of cijfers, bijvoorbeeld 1TKY of FR75." />
-            <x-field name="issue_year" label="Uitgiftejaar" type="number" :value="$member?->breedingNumber?->issue_year ?? now()->year" min="1900" :max="now()->year" />
-        </div>
-    </fieldset>
+    @if ($admin)
+        <fieldset id="breeding-fields">
+            <legend class="mb-1 text-base font-semibold text-brand-900">NBvV-gegevens</legend>
+            <p class="mb-3 text-sm text-stone-600">Jeugd- en volwassen leden zijn automatisch lid van de NBvV en hebben een uniek kweeknummer. Gastleden hebben geen kweeknummer.</p>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <x-field name="breeding_number" label="Kweeknummer (NBvV-lidnummer)" :value="$member?->breedingNumber?->breeding_number" maxlength="4" hint="Precies 4 letters en/of cijfers, bijvoorbeeld 1TKY of FR75." />
+                <x-field name="issue_year" label="Uitgiftejaar" type="number" :value="$member?->breedingNumber?->issue_year ?? now()->year" min="1900" :max="now()->year" />
+            </div>
+        </fieldset>
+    @else
+        <p class="text-sm text-stone-600">Jeugd- en volwassen leden zijn automatisch lid van de NBvV. De administratie kent na verwerking van je aanmelding een kweeknummer toe.</p>
+    @endif
 
     @if ($admin && ! $member?->is_quarantine)
         <label class="flex items-center gap-2 text-sm">
@@ -62,6 +66,7 @@
     (() => {
         const select = document.getElementById('member_type_id');
         const fields = document.getElementById('breeding-fields');
+        if (! fields) return;
         const sync = () => {
             const needsBreedingNumber = select.selectedOptions[0]?.dataset.nbvv === '1';
             fields.hidden = ! needsBreedingNumber;

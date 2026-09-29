@@ -17,7 +17,7 @@
                 @foreach ([
                     ['dashboard', 'Dashboard', 'dashboard'],
                     ['members.index', 'Leden', 'leden*'],
-                    ['member-types.index', 'Lidsoorten', 'lidsoorten*'],
+                    ...(auth()->user()->can('beheer-lidsoorten') ? [['member-types.index', 'Lidsoorten', 'lidsoorten*']] : []),
                     ['breeding-numbers.index', 'Kweeknummers', 'kweeknummers*'],
                     ['invoices.index', 'Facturen', 'facturen*'],
                 ] as [$route, $label, $pattern])

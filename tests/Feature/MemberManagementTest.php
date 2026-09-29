@@ -55,6 +55,27 @@ it('refuses a duplicate breeding number, also one that is archived', function ()
     expect(Member::count())->toBe(0);
 });
 
+it('requires a breeding number of exactly 4 characters', function (string $breedingNumber) {
+    $this->post(route('members.store'), memberPayload(overrides: ['breeding_number' => $breedingNumber]))
+        ->assertSessionHasErrors('breeding_number');
+
+    expect(Member::count())->toBe(0);
+})->with([
+    'te kort' => ['AB'],
+    'te lang' => ['ABCDE'],
+]);
+
+it('archives and restores the breeding number together with the member', function () {
+    $this->post(route('members.store'), memberPayload());
+    $member = Member::firstOrFail();
+
+    $this->delete(route('members.destroy', $member));
+    expect(BreedingNumber::onlyTrashed()->where('member_id', $member->id)->exists())->toBeTrue();
+
+    $this->patch(route('members.restore', $member));
+    expect(BreedingNumber::where('member_id', $member->id)->exists())->toBeTrue();
+});
+
 it('enforces the age limits of the member types', function () {
     $this->post(route('members.store'), memberPayload(MemberType::YOUTH, ['birth_date' => '1985-04-12']))
         ->assertSessionHasErrors('member_type_id');
@@ -135,4 +156,20 @@ it('shows the detail page with all data', function () {
         ->assertOk()
         ->assertSee('Vinkenlaan 12 A')
         ->assertSee('1TKY');
+});
+
+it('exports the filtered member list as csv', function () {
+    $adult = MemberType::where('slug', MemberType::ADULT)->value('id');
+    $guest = MemberType::where('slug', MemberType::GUEST)->value('id');
+
+    Member::factory()->create(['first_name' => 'Piet', 'last_name' => 'Jansen', 'member_type_id' => $adult]);
+    Member::factory()->create(['first_name' => 'Klaas', 'last_name' => 'Bakker', 'member_type_id' => $guest]);
+
+    $csv = $this->get(route('members.export', ['member_type_id' => $guest]))
+        ->assertOk()
+        ->streamedContent();
+
+    expect($csv)->toContain('Naam;Lidsoort')
+        ->and($csv)->toContain('Bakker')
+        ->and($csv)->not->toContain('Jansen');
 });

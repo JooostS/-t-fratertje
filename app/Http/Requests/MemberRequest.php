@@ -53,7 +53,7 @@ class MemberRequest extends FormRequest
             'city' => ['required', 'string', 'max:100'],
             'is_active' => ['boolean'],
             'breeding_number' => $needsBreedingNumber
-                ? ['required', 'string', 'max:20', 'regex:/^[A-Z0-9-]+$/', Rule::unique('breeding_numbers', 'breeding_number')->ignore($this->currentBreedingNumberId())]
+                ? ['required', 'string', 'size:4', 'regex:/^[A-Z0-9]{4}$/', Rule::unique('breeding_numbers', 'breeding_number')->ignore($this->currentBreedingNumberId())]
                 : ['prohibited'],
             'issue_year' => $needsBreedingNumber
                 ? ['required', 'integer', 'between:1900,'.now()->year]

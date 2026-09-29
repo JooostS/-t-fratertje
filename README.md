@@ -15,6 +15,7 @@ Webapplicatie voor het beheren van leden, adressen, lidsoorten, NBvV-gegevens (k
 - [Databaseontwerp](#databaseontwerp)
 - [Projectstructuur](#projectstructuur)
 - [Belangrijkste functionaliteit](#belangrijkste-functionaliteit)
+- [Eigen uitbreidingen](#eigen-uitbreidingen)
 - [Ontwerpkeuzes](#ontwerpkeuzes)
 
 ---
@@ -27,7 +28,7 @@ Webapplicatie voor het beheren van leden, adressen, lidsoorten, NBvV-gegevens (k
 - **Ingangsdatum:** aanmelding + 3 weken, dan de eerstvolgende 1e van de maand (valt de datum precies op de 1e, dan geldt die). Contributie naar rato van de resterende maanden van dat jaar.
   - 5 maart → 26 maart → lid per 1 april → 9 maanden.
   - 25 maart → 15 april → lid per 1 mei → 8 maanden. *(In de opdracht staat "1 juni" bij 8 maanden; 1 juni zou 7 maanden zijn, dus we gaan uit van een typefout.)*
-- **Aanmelden:** publiek formulier (`/aanmelden`). Het lid komt in **quarantaine** en de administratie krijgt een e-mail en ziet het op het dashboard. Het aanvinken van de verklaring geldt als digitale handtekening. Pas na *goedkeuren* wordt het lid actief en ontstaat de contributiefactuur.
+- **Aanmelden:** publiek formulier (`/aanmelden`, zonder kweeknummer — dat kent de administratie later toe). Het lid komt in **quarantaine** en de administratie krijgt een e-mail en ziet het op het dashboard. Het aanvinken van de verklaring geldt als digitale handtekening. Pas na *goedkeuren* wordt het lid actief en ontstaat de contributiefactuur; voor een jeugd- of volwassen aanmelding is dat pas mogelijk nadat er een kweeknummer is toegekend.
 - **Afmelden:** publiek formulier (`/afmelden`), identificatie met e-mailadres + geboortedatum. Wordt direct verwerkt, de administratie krijgt een e-mail en het lid krijgt een restitutiefactuur voor de resterende maanden (zelfde 3-wekenregel).
 - **Soft-deletes:** er wordt niets definitief verwijderd. Leden en kweeknummers zijn terug te zien en te herstellen via de archiefweergave (vinkje "Toon verwijderde …").
 - **Prijswijzigingen:** vastgelegd als tarief met ingangsjaar (`contribution_rates`); alleen een komend jaar is toegestaan. Facturen bewaren het tarief van het moment, dus historie en lopend jaar veranderen nooit.
@@ -36,7 +37,7 @@ Webapplicatie voor het beheren van leden, adressen, lidsoorten, NBvV-gegevens (k
 
 ## Gebruikte tools
 
-Laravel 13 · PHP 8.4 · MySQL · Laravel Herd · Composer · npm/Vite · Tailwind CSS 4 · Pest 5 · Laravel Pint · Laravel Boost · Git
+Laravel 13 · PHP 8.5 · MySQL · Laravel Herd · Composer · npm/Vite · Tailwind CSS 4 · Pest 5 · Laravel Pint · Laravel Boost · Git
 
 ---
 
@@ -83,10 +84,12 @@ php artisan migrate:fresh --seed
 
 ## Test-inloggegevens
 
-| Veld        | Waarde                 |
-|-------------|------------------------|
-| E-mailadres | `admin@fratertje.test` |
-| Wachtwoord  | `password`             |
+| Rol        | E-mailadres                 | Wachtwoord |
+|------------|------------------------------|------------|
+| Beheerder  | `admin@fratertje.test`       | `password` |
+| Secretaris | `secretaris@fratertje.test`  | `password` |
+
+Een **beheerder** mag alles, inclusief lidsoorten en tarieven wijzigen. Een **secretaris** beheert leden en kweeknummers, maar krijgt op lidsoorten/tarieven een 403 (en ziet die link niet eens in het menu).
 
 *Alleen voor lokaal testen/beoordelen.*
 
@@ -106,6 +109,8 @@ E-mails (signalering aan de administratie) worden lokaal naar `storage/logs/lara
 
 Jaarlijkse contributiefacturering voor bestaande leden: `php artisan invoices:generate` (staat ingepland op 1 januari).
 
+Jeugdleden omzetten naar volwassen lid zodra ze 18 worden: `php artisan members:promote-adults` (staat dagelijks ingepland, want verjaardagen vallen het hele jaar door).
+
 ---
 
 ## Tests draaien
@@ -114,10 +119,10 @@ Jaarlijkse contributiefacturering voor bestaande leden: `php artisan invoices:ge
 php artisan test
 ```
 
-63 Pest-tests (in-memory SQLite, dus de MySQL-database blijft ongemoeid):
+73 Pest-tests (in-memory SQLite, dus de MySQL-database blijft ongemoeid):
 
 - **Unit** — `ContributionCalculatorTest`: ingangsdatum, aantal maanden, jeugdtarief en bedragen naar rato, inclusief de voorbeelden uit de opdracht.
-- **Feature** — login/uitloggen en afscherming van alle beheerpagina's; validatie van het ledenformulier (kweeknummer verplicht/verboden/uniek, leeftijdsgrenzen, formaten); aanmelden → quarantaine → goedkeuren → factuur; afmelden → restitutie; prijswijzigingen alleen voor een komend jaar; soft-deletes met archief en herstel; zoeken en filteren; alle pagina's renderen; de publieke pagina's (home, informatie, contactformulier, fotoverantwoording).
+- **Feature** — login/uitloggen en afscherming van alle beheerpagina's; rolverschil secretaris/beheerder; validatie van het ledenformulier (kweeknummer verplicht/verboden/uniek/precies 4 tekens, leeftijdsgrenzen, formaten); aanmelden → quarantaine → (kweeknummer toekennen →) goedkeuren → factuur; afmelden → restitutie; jeugdlid wordt op zijn 18e automatisch volwassen lid; prijswijzigingen alleen voor een komend jaar; soft-deletes (incl. kweeknummer) met archief en herstel; zoeken en filteren; CSV-export; kweeknummer-geschiedenis; jaaroverzicht op de facturenpagina; alle pagina's renderen; de publieke pagina's (home, informatie, contactformulier, fotoverantwoording).
 
 ---
 
@@ -234,16 +239,27 @@ Berekeningen zitten niet in de controllers: de controllers roepen `MemberService
 - CRUD voor leden (met adres en kweeknummer), lidsoorten (met tariefbeheer) en kweeknummers; verwijderen vraagt om bevestiging en is een soft-delete met herstelknop.
 - Publieke site: homepage met vogelfoto's en actuele tarieven, informatiepagina (lidsoorten, NBvV, aan- en afmelden met rekenvoorbeelden, veelgestelde vragen) en een contactpagina met formulier.
 - Publiek aan- en afmeldformulier met signalering aan de administratie.
-- Facturenoverzicht met contributie- en restitutiefacturen.
+- Facturenoverzicht met contributie- en restitutiefacturen, plus een jaaroverzicht (contributie/restitutie/netto per jaar).
+
+---
+
+## Eigen uitbreidingen
+
+Naast de verplichte opdracht zijn, in overleg met de docent, deze uitbreidingen uit §17 van de opdracht ("mogelijke uitbreidingen") toegevoegd:
+
+- **Leden exporteren naar CSV** — knop "Exporteren naar CSV" op het ledenoverzicht, exporteert de huidige (gefilterde) lijst, incl. UTF-8 BOM zodat Excel het meteen goed weergeeft.
+- **Rolverschil secretaris/beheerder** — `users.role` bepaalt via een `Gate` (`beheer-lidsoorten`, gedefinieerd in `AppServiceProvider`) wie lidsoorten en tarieven mag wijzigen. Een secretaris kan wel leden en kweeknummers beheren, maar krijgt op `/lidsoorten` een 403 en ziet die link niet in de navigatie.
+- **Geschiedenis van kweeknummers** — `/kweeknummers/geschiedenis` toont alle ooit uitgegeven kweeknummers (actief én gearchiveerd) samen, op uitgiftejaar.
+- **Jaaroverzicht contributie-inkomsten** — bovenaan `/facturen` staat een tabel met contributie, restitutie en netto-inkomsten per jaar.
 
 ---
 
 ## Ontwerpkeuzes
 
-- **Eén plek voor het kweeknummer** (zie Databaseontwerp).
-- **Kweeknummer altijd verplicht bij aanmelden** voor jeugd- en volwassen leden, zodat ook een lid in quarantaine nooit zonder nummer wordt opgeslagen.
-- **Kweeknummers blijven gereserveerd** wanneer een lid of nummer wordt gearchiveerd (unieke index telt soft-deleted rijen mee). Een kweeknummer van een *actief* lid kan niet worden verwijderd.
-- **Tarief volgt de leeftijd, niet alleen de lidsoort**: `Member::tariffSlugFor()` kiest per factuurjaar het jeugd- of volwassentarief, zodat het "jaar dat je 18 wordt"-voordeel automatisch klopt.
+- **Eén plek voor het kweeknummer** (zie Databaseontwerp), en overal dezelfde validatie: precies 4 hoofdletters/cijfers, zowel bij het ledenformulier als bij het kweeknummer-CRUD (en dus consistent met de `varchar(4)`-kolom).
+- **Kweeknummer wordt pas bij verwerking toegekend**, niet al bij het publieke aanmeldformulier: de aanmelder kent het (nog) niet, de administratie vult het in tijdens het verwerken van de quarantaine-aanmelding. "Goedkeuren" wordt daarom geblokkeerd zolang een jeugd- of volwassen aanmelding nog geen kweeknummer heeft; het dashboard laat dat direct zien in de wachtrij.
+- **Kweeknummers blijven gereserveerd** wanneer een lid of nummer wordt gearchiveerd (unieke index telt soft-deleted rijen mee), en worden **samen met het lid** gearchiveerd/hersteld. Een kweeknummer van een *actief* lid kan niet los worden verwijderd.
+- **Tarief volgt de leeftijd, niet alleen de lidsoort**: `Member::tariffSlugFor()` kiest per factuurjaar het jeugd- of volwassentarief, zodat het "jaar dat je 18 wordt"-voordeel automatisch klopt. De lidsoort zelf schuift ook automatisch mee: `members:promote-adults` zet een jeugdlid op zijn 18e verjaardag om naar volwassen lid.
 - **Digitale handtekening** = verplicht aanvinkbare verklaring; server-side gevalideerd (`accepted`).
 
 ---
