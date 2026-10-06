@@ -12,6 +12,9 @@ class GenerateContributionInvoices extends Command
 
     protected $description = 'Maakt de jaarlijkse contributiefactuur voor alle actieve leden die er dit jaar nog geen hebben';
 
+    /**
+     * Factureert het volledige jaar voor actieve leden die vóór 1 januari al lid waren en nog geen contributiefactuur hebben; wie later instroomt wordt bij activering gefactureerd.
+     */
     public function handle(): int
     {
         $year = (int) ($this->argument('year') ?? now()->year);

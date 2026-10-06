@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Mail;
  */
 class NotifyAdministration
 {
+    /**
+     * Mailt de administratie bij een nieuwe aanmelding.
+     */
     public function handleMemberSignedUp(MemberSignedUp $event): void
     {
         $this->notify(
@@ -23,6 +26,9 @@ class NotifyAdministration
         );
     }
 
+    /**
+     * Mailt de administratie bij een afmelding.
+     */
     public function handleMemberCancelled(MemberCancelled $event): void
     {
         $this->notify(
@@ -32,6 +38,9 @@ class NotifyAdministration
         );
     }
 
+    /**
+     * Verstuurt de melding naar alle gebruikers, met een link naar het lid.
+     */
     private function notify(string $subject, string $text, Member $member): void
     {
         Mail::to(User::pluck('email')->all())

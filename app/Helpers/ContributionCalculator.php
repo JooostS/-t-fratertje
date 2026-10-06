@@ -42,6 +42,9 @@ final class ContributionCalculator
         return $year - $birthDate->year <= self::YOUTH_UNTIL_AGE;
     }
 
+    /**
+     * Evenredig deel van het jaarbedrag voor het aantal maanden, afgerond op centen.
+     */
     public static function amountForMonths(float $annualAmount, int $months): float
     {
         return round($annualAmount * $months / 12, 2);

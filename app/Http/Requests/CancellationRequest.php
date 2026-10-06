@@ -28,6 +28,8 @@ class CancellationRequest extends FormRequest
     }
 
     /**
+     * Zoekt het actieve lid bij e-mailadres en geboortedatum; zo kan niemand een ander afmelden.
+     *
      * @return array<int, callable(Validator): void>
      */
     public function after(): array
@@ -49,6 +51,9 @@ class CancellationRequest extends FormRequest
         }];
     }
 
+    /**
+     * Het gevonden lid; alleen aanroepen nadat de validatie is geslaagd.
+     */
     public function member(): Member
     {
         return $this->member;

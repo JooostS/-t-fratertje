@@ -10,11 +10,17 @@ use Illuminate\View\View;
 
 class SignupController extends Controller
 {
+    /**
+     * Publiek aanmeldformulier.
+     */
     public function create(): View
     {
         return view('signup.create', ['memberTypes' => MemberType::orderBy('name')->get()]);
     }
 
+    /**
+     * Slaat de aanmelding op als lid in quarantaine; de administratie keurt later goed.
+     */
     public function store(SignupRequest $request, MemberService $members): RedirectResponse
     {
         $members->signUp($request->validated());

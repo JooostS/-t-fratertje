@@ -9,11 +9,17 @@ use Illuminate\View\View;
 
 class CancellationController extends Controller
 {
+    /**
+     * Publiek afmeldformulier.
+     */
     public function create(): View
     {
         return view('cancellation.create');
     }
 
+    /**
+     * Verwerkt een afmelding; het lid is al gevonden en gecontroleerd in CancellationRequest.
+     */
     public function store(CancellationRequest $request, MemberService $members): RedirectResponse
     {
         $member = $request->member();

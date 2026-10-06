@@ -10,11 +10,17 @@ use Illuminate\View\View;
 
 class ContactController extends Controller
 {
+    /**
+     * Publiek contactformulier.
+     */
     public function create(): View
     {
         return view('contact');
     }
 
+    /**
+     * Mailt het bericht naar het clubadres (config club.email); de afzender komt als reply-to.
+     */
     public function store(ContactRequest $request): RedirectResponse
     {
         Mail::to(config('club.email'))->send(new ContactMessage(...$request->validated()));

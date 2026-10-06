@@ -8,6 +8,9 @@ use App\Models\Invoice;
 
 class CreateContributionInvoice
 {
+    /**
+     * Bepaalt de ingangsdatum en factureert de resterende maanden van dat jaar.
+     */
     public function handle(MemberActivated $event): void
     {
         $member = $event->member;

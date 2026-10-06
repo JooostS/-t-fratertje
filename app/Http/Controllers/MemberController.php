@@ -16,6 +16,9 @@ class MemberController extends Controller
 {
     public function __construct(private MemberService $members) {}
 
+    /**
+     * Ledenlijst met zoeken en filters op lidsoort, status en archief.
+     */
     public function index(Request $request): View
     {
         $members = $this->filteredMembers($request)
@@ -29,6 +32,9 @@ class MemberController extends Controller
         ]);
     }
 
+    /**
+     * Exporteert de gefilterde ledenlijst als CSV (puntkomma-gescheiden, met BOM voor Excel).
+     */
     public function export(Request $request): StreamedResponse
     {
         $members = $this->filteredMembers($request)->get();
@@ -60,6 +66,9 @@ class MemberController extends Controller
         }, 'leden-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
     }
 
+    /**
+     * Gedeelde query voor lijst en export, zodat die altijd dezelfde selectie tonen.
+     */
     private function filteredMembers(Request $request): Builder
     {
         return Member::query()
@@ -72,11 +81,17 @@ class MemberController extends Controller
             ->orderBy('first_name');
     }
 
+    /**
+     * Formulier voor een nieuw lid.
+     */
     public function create(): View
     {
         return view('members.create', ['memberTypes' => MemberType::orderBy('name')->get()]);
     }
 
+    /**
+     * Voegt een lid toe via MemberService (lid, adres en kweeknummer in één transactie).
+     */
     public function store(MemberRequest $request): RedirectResponse
     {
         $member = $this->members->create($request->validated());
@@ -84,6 +99,9 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('status', 'Lid is toegevoegd.');
     }
 
+    /**
+     * Detailpagina met adres, kweeknummer en facturen; ook voor gearchiveerde leden.
+     */
     public function show(Member $member): View
     {
         $member->load(['memberType', 'address', 'breedingNumber', 'invoices']);
@@ -91,6 +109,9 @@ class MemberController extends Controller
         return view('members.show', ['member' => $member]);
     }
 
+    /**
+     * Formulier om een lid te wijzigen.
+     */
     public function edit(Member $member): View
     {
         $member->load(['address', 'breedingNumber']);
@@ -101,6 +122,9 @@ class MemberController extends Controller
         ]);
     }
 
+    /**
+     * Wijzigt lid, adres en kweeknummer via MemberService.
+     */
     public function update(MemberRequest $request, Member $member): RedirectResponse
     {
         $this->members->update($member, $request->validated());
@@ -108,6 +132,9 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('status', 'Lid is gewijzigd.');
     }
 
+    /**
+     * Archiveert een lid (soft delete) in plaats van het te verwijderen.
+     */
     public function destroy(Member $member): RedirectResponse
     {
         $this->members->archive($member);
@@ -115,6 +142,9 @@ class MemberController extends Controller
         return redirect()->route('members.index')->with('status', "{$member->full_name} is gearchiveerd.");
     }
 
+    /**
+     * Haalt een gearchiveerd lid terug uit het archief.
+     */
     public function restore(Member $member): RedirectResponse
     {
         $this->members->restore($member);
@@ -122,6 +152,9 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('status', "{$member->full_name} is teruggehaald uit het archief.");
     }
 
+    /**
+     * Keurt een aanmelding in quarantaine goed; start de contributiefactuur.
+     */
     public function approve(Member $member): RedirectResponse
     {
         abort_unless($member->is_quarantine, 404);

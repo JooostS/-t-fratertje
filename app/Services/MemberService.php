@@ -22,6 +22,8 @@ class MemberService
     private const MEMBER_FIELDS = ['member_type_id', 'first_name', 'last_name', 'email', 'birth_date'];
 
     /**
+     * Voegt een lid toe via de administratie; een actief lid wordt meteen gefactureerd.
+     *
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): Member
@@ -36,6 +38,8 @@ class MemberService
     }
 
     /**
+     * Publieke aanmelding: het lid komt in quarantaine tot de administratie goedkeurt.
+     *
      * @param  array<string, mixed>  $data
      */
     public function signUp(array $data): Member
@@ -48,6 +52,8 @@ class MemberService
     }
 
     /**
+     * Wijzigt lid, adres en kweeknummer in één transactie.
+     *
      * @param  array<string, mixed>  $data
      */
     public function update(Member $member, array $data): Member
@@ -65,6 +71,9 @@ class MemberService
         });
     }
 
+    /**
+     * Haalt een lid uit quarantaine en activeert het; dat start de contributiefactuur.
+     */
     public function approve(Member $member): void
     {
         $member->update(['is_quarantine' => false, 'is_active' => true]);
@@ -72,6 +81,9 @@ class MemberService
         MemberActivated::dispatch($member);
     }
 
+    /**
+     * Meldt een lid af; het lidmaatschap eindigt na de wachttijd en dat levert eventueel restitutie op.
+     */
     public function cancel(Member $member): void
     {
         $member->update([
@@ -104,6 +116,8 @@ class MemberService
     }
 
     /**
+     * Gedeelde opslag voor create en signUp; maakt adres, lid en kweeknummer aan.
+     *
      * @param  array<string, mixed>  $data
      */
     private function store(array $data, bool $quarantine): Member

@@ -67,6 +67,9 @@ class Member extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    /**
+     * Voor- en achternaam samen.
+     */
     protected function fullName(): Attribute
     {
         return Attribute::get(fn () => "{$this->first_name} {$this->last_name}");
@@ -80,6 +83,9 @@ class Member extends Model
         return Attribute::get(fn () => $this->breedingNumber?->breeding_number);
     }
 
+    /**
+     * Afgeleide status; quarantaine gaat voor actief en inactief.
+     */
     protected function status(): Attribute
     {
         return Attribute::get(fn () => match (true) {
@@ -103,6 +109,9 @@ class Member extends Model
             : MemberType::ADULT;
     }
 
+    /**
+     * Zoekt op voornaam, achternaam, volledige naam of kweeknummer; % en _ worden ge-escaped.
+     */
     public function scopeSearch(Builder $query, ?string $term): void
     {
         $term = trim((string) $term);
@@ -121,6 +130,9 @@ class Member extends Model
         });
     }
 
+    /**
+     * Filtert op lidsoort; zonder id doet het niets.
+     */
     public function scopeOfType(Builder $query, ?int $memberTypeId): void
     {
         if ($memberTypeId) {
@@ -128,6 +140,9 @@ class Member extends Model
         }
     }
 
+    /**
+     * Filtert op actief, inactief of quarantaine; een onbekende waarde doet niets.
+     */
     public function scopeWithStatus(Builder $query, ?string $status): void
     {
         match ($status) {

@@ -12,6 +12,9 @@ class PromoteAdultMembers extends Command
 
     protected $description = 'Zet jeugdleden die 18 zijn geworden om naar volwassen lid';
 
+    /**
+     * Zet alle jeugdleden van 18 jaar of ouder om naar volwassen lid.
+     */
     public function handle(): int
     {
         $adultType = MemberType::where('slug', MemberType::ADULT)->firstOrFail();

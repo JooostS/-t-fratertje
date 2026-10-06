@@ -12,6 +12,9 @@ use Illuminate\View\View;
 
 class BreedingNumberController extends Controller
 {
+    /**
+     * Lijst met kweeknummers; zoekt op nummer en toont optioneel alleen de gearchiveerde.
+     */
     public function index(Request $request): View
     {
         $archived = $request->boolean('archived');
@@ -31,6 +34,9 @@ class BreedingNumberController extends Controller
         ]);
     }
 
+    /**
+     * Formulier voor een nieuw kweeknummer; kiesbaar zijn alleen leden die er nog geen hebben.
+     */
     public function create(): View
     {
         return view('breeding-numbers.create', ['members' => $this->membersWithoutBreedingNumber()]);
@@ -50,6 +56,9 @@ class BreedingNumberController extends Controller
         return view('breeding-numbers.history', ['breedingNumbers' => $breedingNumbers]);
     }
 
+    /**
+     * Registreert een nieuw kweeknummer bij een lid.
+     */
     public function store(BreedingNumberRequest $request): RedirectResponse
     {
         BreedingNumber::create($request->validated());
@@ -57,11 +66,17 @@ class BreedingNumberController extends Controller
         return redirect()->route('breeding-numbers.index')->with('status', 'Kweeknummer is geregistreerd.');
     }
 
+    /**
+     * Formulier om nummer of uitgiftejaar te wijzigen; het lid ligt vast.
+     */
     public function edit(BreedingNumber $breedingNumber): View
     {
         return view('breeding-numbers.edit', ['breedingNumber' => $breedingNumber->load('member')]);
     }
 
+    /**
+     * Wijzigt nummer of uitgiftejaar van een kweeknummer.
+     */
     public function update(BreedingNumberRequest $request, BreedingNumber $breedingNumber): RedirectResponse
     {
         $breedingNumber->update($request->validated());
@@ -69,6 +84,9 @@ class BreedingNumberController extends Controller
         return redirect()->route('breeding-numbers.index')->with('status', 'Kweeknummer is gewijzigd.');
     }
 
+    /**
+     * Archiveert een kweeknummer; geweigerd bij een actief NBvV-lid, want die moet er een hebben.
+     */
     public function destroy(BreedingNumber $breedingNumber): RedirectResponse
     {
         if ($breedingNumber->member->is_active && $breedingNumber->member->memberType->is_nbvv_member) {
@@ -80,6 +98,9 @@ class BreedingNumberController extends Controller
         return redirect()->route('breeding-numbers.index')->with('status', 'Kweeknummer is gearchiveerd.');
     }
 
+    /**
+     * Haalt een gearchiveerd kweeknummer terug.
+     */
     public function restore(BreedingNumber $breedingNumber): RedirectResponse
     {
         $breedingNumber->restore();

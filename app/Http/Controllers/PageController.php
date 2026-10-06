@@ -9,11 +9,17 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
+    /**
+     * Publieke startpagina.
+     */
     public function home(): View
     {
         return view('home', ['memberTypes' => MemberType::orderBy('id')->get()]);
     }
 
+    /**
+     * Publieke informatiepagina met lidsoorten, tarieven en rekenvoorbeelden.
+     */
     public function info(): View
     {
         return view('info', [

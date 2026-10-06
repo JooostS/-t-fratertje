@@ -8,6 +8,9 @@ use App\Models\Invoice;
 
 class CreateRefundInvoice
 {
+    /**
+     * Maakt een negatieve factuur voor de al betaalde maanden na de einddatum, maximaal zoveel als er gefactureerd is.
+     */
     public function handle(MemberCancelled $event): void
     {
         $member = $event->member;

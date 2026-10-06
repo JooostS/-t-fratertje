@@ -12,6 +12,9 @@ class MemberTypeRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Een niet-aangevinkte checkbox wordt niet meegestuurd; maak er expliciet false van.
+     */
     protected function prepareForValidation(): void
     {
         $this->merge(['is_nbvv_member' => $this->boolean('is_nbvv_member')]);

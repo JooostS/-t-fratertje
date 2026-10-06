@@ -15,6 +15,9 @@ class BreedingNumberRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Zet het kweeknummer om naar hoofdletters zonder spaties.
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([
@@ -51,6 +54,8 @@ class BreedingNumberRequest extends FormRequest
     }
 
     /**
+     * Controleert dat het gekozen lid geen gastlid is.
+     *
      * @return array<int, callable(Validator): void>
      */
     public function after(): array

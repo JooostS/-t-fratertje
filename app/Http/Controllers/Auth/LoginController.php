@@ -11,11 +11,17 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
+    /**
+     * Inlogformulier.
+     */
     public function create(): View
     {
         return view('auth.login');
     }
 
+    /**
+     * Logt in; bij een fout bewust één algemene melding, zodat niet blijkt welk deel klopt.
+     */
     public function store(LoginRequest $request): RedirectResponse
     {
         if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
@@ -29,6 +35,9 @@ class LoginController extends Controller
         return redirect()->intended(route('dashboard'));
     }
 
+    /**
+     * Logt uit en maakt de sessie en CSRF-token ongeldig.
+     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::logout();

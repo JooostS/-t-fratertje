@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\ContributionCalculator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -33,6 +34,24 @@ class Invoice extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class)->withTrashed();
+    }
+
+    /**
+     * Factuurnummer, bijvoorbeeld F2026-00012.
+     */
+    public function getNumberAttribute(): string
+    {
+        return sprintf('F%d-%05d', $this->year, $this->id);
+    }
+
+    /**
+     * Zoekt facturen op de gegevens van het lid (naam of kweeknummer).
+     */
+    public function scopeSearch(Builder $query, ?string $term): void
+    {
+        if (trim((string) $term) !== '') {
+            $query->whereHas('member', fn (Builder $member) => $member->search($term));
+        }
     }
 
     /**

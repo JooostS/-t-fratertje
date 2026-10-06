@@ -10,6 +10,9 @@ use Illuminate\View\View;
 
 class MemberTypeController extends Controller
 {
+    /**
+     * Lijst van lidsoorten met het aantal leden.
+     */
     public function index(): View
     {
         return view('member-types.index', [
@@ -17,11 +20,17 @@ class MemberTypeController extends Controller
         ]);
     }
 
+    /**
+     * Formulier voor een nieuwe lidsoort.
+     */
     public function create(): View
     {
         return view('member-types.create');
     }
 
+    /**
+     * Maakt een lidsoort met meteen het eerste jaartarief (geldig vanaf dit jaar).
+     */
     public function store(MemberTypeRequest $request): RedirectResponse
     {
         $data = $request->validated();
@@ -41,6 +50,9 @@ class MemberTypeController extends Controller
         return redirect()->route('member-types.edit', $memberType)->with('status', 'Lidsoort is toegevoegd.');
     }
 
+    /**
+     * Formulier voor een lidsoort met de tariefhistorie.
+     */
     public function edit(MemberType $memberType): View
     {
         return view('member-types.edit', [
@@ -49,6 +61,9 @@ class MemberTypeController extends Controller
         ]);
     }
 
+    /**
+     * Wijzigt naam, omschrijving of NBvV-status; tarieven lopen via ContributionRateController.
+     */
     public function update(MemberTypeRequest $request, MemberType $memberType): RedirectResponse
     {
         $memberType->update($request->validated());
@@ -56,6 +71,9 @@ class MemberTypeController extends Controller
         return redirect()->route('member-types.index')->with('status', 'Lidsoort is gewijzigd.');
     }
 
+    /**
+     * Verwijdert een lidsoort, maar alleen zolang er geen (gearchiveerde) leden aan hangen.
+     */
     public function destroy(MemberType $memberType): RedirectResponse
     {
         if ($memberType->members()->withTrashed()->exists()) {

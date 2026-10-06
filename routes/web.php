@@ -62,4 +62,5 @@ Route::middleware('auth')->group(function () {
         ->except('show');
 
     Route::get('facturen', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('facturen/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 });

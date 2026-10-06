@@ -8,6 +8,9 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    /**
+     * Overzicht: aantal actieve en gearchiveerde leden, leden per lidsoort en aanmeldingen die op goedkeuring wachten.
+     */
     public function __invoke(): View
     {
         return view('dashboard', [

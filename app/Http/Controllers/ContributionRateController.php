@@ -8,6 +8,9 @@ use Illuminate\Http\RedirectResponse;
 
 class ContributionRateController extends Controller
 {
+    /**
+     * Legt een nieuw jaartarief vast; bestaat er al een tarief voor dat jaar, dan wordt het bedrag overschreven.
+     */
     public function store(ContributionRateRequest $request, MemberType $memberType): RedirectResponse
     {
         $memberType->contributionRates()->updateOrCreate(

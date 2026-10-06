@@ -18,6 +18,9 @@ class MemberRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Normaliseert postcode ("1234ab" wordt "1234 AB"), kweeknummer (hoofdletters) en de actief-checkbox.
+     */
     protected function prepareForValidation(): void
     {
         $postalCode = strtoupper(preg_replace('/\s+/', '', (string) $this->input('postal_code')));
@@ -86,11 +89,17 @@ class MemberRequest extends FormRequest
         }];
     }
 
+    /**
+     * De gekozen lidsoort, één keer opgehaald per request.
+     */
     protected function memberType(): ?MemberType
     {
         return $this->memberType ??= MemberType::find($this->input('member_type_id'));
     }
 
+    /**
+     * Id van het (ook gearchiveerde) kweeknummer van het lid dat wordt bewerkt, zodat de unieke-regel dat negeert.
+     */
     private function currentBreedingNumberId(): ?int
     {
         $member = $this->route('member');

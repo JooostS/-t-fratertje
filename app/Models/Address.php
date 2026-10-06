@@ -25,6 +25,9 @@ class Address extends Model
         return $this->hasOne(Member::class);
     }
 
+    /**
+     * Straat, huisnummer en toevoeging als één regel.
+     */
     protected function fullStreet(): Attribute
     {
         return Attribute::get(fn () => trim("{$this->street} {$this->house_number} {$this->house_number_addition}"));
