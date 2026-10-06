@@ -27,7 +27,7 @@ Webapplicatie voor het beheren van leden, adressen, lidsoorten, NBvV-gegevens (k
 - **Contributie:** volwassen € 36,00, jeugd € 18,00, gast € 18,00 per jaar. Een jeugdlid betaalt ook in het jaar waarin het 18 wordt nog het jeugdtarief (`ContributionCalculator::isYouthTariff`).
 - **Ingangsdatum:** aanmelding + 3 weken, dan de eerstvolgende 1e van de maand (valt de datum precies op de 1e, dan geldt die). Contributie naar rato van de resterende maanden van dat jaar.
   - 5 maart → 26 maart → lid per 1 april → 9 maanden.
-  - 25 maart → 15 april → lid per 1 mei → 8 maanden. *(In de opdracht staat "1 juni" bij 8 maanden; 1 juni zou 7 maanden zijn, dus we gaan uit van een typefout.)*
+  - 25 maart → 15 april → lid per 1 mei → 8 maanden.
 - **Aanmelden:** publiek formulier (`/aanmelden`, zonder kweeknummer — dat kent de administratie later toe). Het lid komt in **quarantaine** en de administratie krijgt een e-mail en ziet het op het dashboard. Het aanvinken van de verklaring geldt als digitale handtekening. Pas na *goedkeuren* wordt het lid actief en ontstaat de contributiefactuur; voor een jeugd- of volwassen aanmelding is dat pas mogelijk nadat er een kweeknummer is toegekend.
 - **Afmelden:** publiek formulier (`/afmelden`), identificatie met e-mailadres + geboortedatum. Wordt direct verwerkt, de administratie krijgt een e-mail en het lid krijgt een restitutiefactuur voor de resterende maanden (zelfde 3-wekenregel).
 - **Soft-deletes:** er wordt niets definitief verwijderd. Leden en kweeknummers zijn terug te zien en te herstellen via de archiefweergave (vinkje "Toon verwijderde …").
