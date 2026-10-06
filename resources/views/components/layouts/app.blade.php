@@ -20,6 +20,7 @@
                     ...(auth()->user()->can('beheer-lidsoorten') ? [['member-types.index', 'Lidsoorten', 'lidsoorten*']] : []),
                     ['breeding-numbers.index', 'Kweeknummers', 'kweeknummers*'],
                     ['invoices.index', 'Facturen', 'facturen*'],
+                    ...(auth()->user()->can('beheer-gebruikers') ? [['users.index', 'Gebruikers', 'gebruikers*']] : []),
                 ] as [$route, $label, $pattern])
                     <a href="{{ route($route) }}"
                        @class(['rounded-md px-3 py-1.5 hover:bg-brand-700', 'bg-brand-700' => request()->is($pattern)])

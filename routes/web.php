@@ -11,6 +11,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MemberTypeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SignupController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Publiek: informatie en de digitale aan- en afmeldformulieren.
@@ -53,6 +54,13 @@ Route::middleware('auth')->group(function () {
             ->except('show');
         Route::post('lidsoorten/{member_type}/tarieven', [ContributionRateController::class, 'store'])->name('contribution-rates.store');
     });
+
+    // Gebruikers (beheerders en secretarissen) beheren is voorbehouden aan de rol 'beheerder'.
+    Route::resource('gebruikers', UserController::class)
+        ->parameters(['gebruikers' => 'user'])
+        ->names('users')
+        ->except('show')
+        ->middleware('can:beheer-gebruikers');
 
     Route::get('kweeknummers/geschiedenis', [BreedingNumberController::class, 'history'])->name('breeding-numbers.history');
     Route::patch('kweeknummers/{breeding_number}/herstellen', [BreedingNumberController::class, 'restore'])->withTrashed()->name('breeding-numbers.restore');

@@ -22,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('beheer-lidsoorten', fn (User $user) => $user->isBeheerder());
+        Gate::define('beheer-gebruikers', fn (User $user) => $user->isBeheerder());
     }
 }

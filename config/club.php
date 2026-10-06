@@ -14,6 +14,8 @@ return [
     'email' => env('CLUB_EMAIL', 'secretaris@fratertje.test'),
     'phone' => env('CLUB_PHONE'),
     'address' => env('CLUB_ADDRESS'),
+    // Rekeningnummer voor de contributiefactuur; wordt alleen getoond als het is ingevuld.
+    'iban' => env('CLUB_IBAN'),
 
     /*
     |--------------------------------------------------------------------------
